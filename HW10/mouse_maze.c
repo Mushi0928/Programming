@@ -46,7 +46,7 @@ int main(){
     Recursive step:
         分別嘗試走上下左右四個方向，若不會超出邊界，且下一步的位置沒走過且不為'#'，就進入下個遞迴
         下個遞迴開始前將下一步的位置的walked設成1，下一步return後再設回來
-        *若當前的步數已經超過(leastStep-1)，表示之後再怎麼跑步數都不會更少了，所以就不做嘗試直接return
+        *若當前的步數已經超過或等於(leastStep-1)，表示之後再怎麼跑步數都不會更少了，所以就不做嘗試直接return
 */
 void nextStep(int curR,int curC,int step){
     printf("curR:%4d curC:%d step:%4d\n",curR,curC,step);
