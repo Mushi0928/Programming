@@ -61,11 +61,11 @@ int main(){
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 int main(){
-    char a[20] = "CBCDA";
-    char b[20] = "BBCDZ";
-    printf("%d\n",strcmp(a,b));
-    return 0;
+    char a[5];
+    printf("%d\n","");
     
+    return 0;
 }
