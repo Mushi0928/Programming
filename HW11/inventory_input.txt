@@ -1,0 +1,10 @@
+9
+Bulbasaur 29 29
+Zigzagoon 30 30
+Dratini 43 43
+Blaziken 0 156
+Blissey 0 398
+Swampert 12 179
+Glaceon 88 138
+Magnezone 2 143
+Slaking 0 226

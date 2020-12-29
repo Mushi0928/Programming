@@ -65,7 +65,7 @@ int main(){
 
 int main(){
     char a[5];
-    printf("%d\n","");
+    printf("%d\n",a[0]);
     
     return 0;
 }

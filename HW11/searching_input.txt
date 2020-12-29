@@ -1,0 +1,5 @@
+ms
+Abstract
+The universal mobile telecommunications system (UMTS) utilizes the discontinuous reception (DRX) mechanism to reduce the power consumption of mobile stations (MSs).
+The sleep/wake-up scheduling of each MS is determined by two DRX parameters: the inactivity timer threshold and the DRX cycle.
+The UMTS DRX mechanism is realized through the radio resource control (RRC) finite state machine exercised between the RNC and the MS [1].

@@ -15,10 +15,13 @@ int main(){
         scanf("%d %d",&N,&M);
         for(int j = 0;j<N;j++){
             scanf("%s",map[j]);
+            for(int k = 0;k<M;k++){
+                visited[j][k] = 0;
+            }
         }
         DFS(0,0);
         if(visited[N-1][M-1]){
-            printf("Yes");
+            printf("Yes\n");
             continue;
         }
         for(int j = 0;j<N;j++){
@@ -33,11 +36,12 @@ int main(){
         }else{
             printf("No\n");
         }
+        teleport = 0;
     }
     return 0;
 }
 void DFS(int curX,int curY){
-    printf("%4d %4d\n",curX,curY);
+    //printf("%4d %4d\n",curX,curY);
     if(visited[curX][curY]){
         return;
     }else if(map[curX][curY] == 'T'){
