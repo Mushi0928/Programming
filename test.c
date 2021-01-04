@@ -64,8 +64,8 @@ int main(){
 #include <ctype.h>
 
 int main(){
-    char a[5];
-    printf("%d\n",a[0]);
-    
+    char a[5] = "a";
+    char b[5] = "b";
+    printf("%d",strcmp(a,b));
     return 0;
 }
