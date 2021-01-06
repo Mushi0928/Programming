@@ -2,22 +2,35 @@
 void Push(Node** ptr_head, int x){
     Node* temp = (Node*)malloc(sizeof(Node));
     temp->data = x;
-    if(*ptr_head != NULL){
-        temp->next = *ptr_head;   
-    }
+    temp->next = *ptr_head;   
     *ptr_head = temp;
 }
 void Pop(Node** ptr_head){
-    Node* temp = *ptr_head;
-    *ptr_head = (*ptr_head)->next;
-    free(temp);
+    if(*ptr_head != NULL){
+        Node* temp = *ptr_head;
+        *ptr_head = (*ptr_head)->next;
+        free(temp);
+    }
 }
 void Reverse_List(Node** ptr_head){
-    static Node* head = NULL;
-    if((*ptr_head)->next == NULL){
-        head = *ptr_head;
-    }else{
-        Reverse_List(&((*ptr_head)->next)));
-        
+    if(*ptr_head == NULL)return;
+    Node* temp = *ptr_head;
+    int count = 0;
+    while(temp->next != NULL){
+        count++;
+        temp = temp->next;
     }
+    temp = *ptr_head;
+    Node* ptr[count];
+    for(int i = 0;i<count;i++){
+        ptr[i] = temp;
+        temp = temp->next;
+    }
+    Node* new_head = temp;
+    for(int i = count-1;i >= 0;i--){
+        temp->next = ptr[i];
+        temp = temp->next;
+    }
+    temp->next = NULL;
+    *ptr_head = new_head;
 }

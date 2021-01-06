@@ -6,7 +6,7 @@
 void Insert( Node** Table, int N, int score, char* name ){
     //printf("INS\n");
     Node* temp = (Node*)malloc(sizeof(Node));
-    char* string = (char*)malloc(100*sizeof(char));
+    char* string = (char*)malloc(101*sizeof(char));
     strcpy(string,name);
     temp->name = string;
     temp->score = score;
@@ -26,6 +26,9 @@ void Delete( Node** Table, int N, char* name ){
             Table[i-1] = Table[i];
         }
     }
+    if(flag == 1){
+        Table[N-1] = NULL;
+    }
 }
 //Return int array contains the indices of top x Nodes in Table.
 //The rank of Node* is defined below:
@@ -33,18 +36,18 @@ void Delete( Node** Table, int N, char* name ){
 //  For those with same score, ranking by their names in lexicological order.
 int* Top( Node** Table, int N, int x){
     //printf("TOP\n");
-    int* rank = (int*)malloc((N+1)*sizeof(int));
+    int* rank = (int*)malloc((x+1)*sizeof(int));
     for(int i = N-1;i>0;i--){
-        for(int j = 0;j < i;j++){
-            if(Table[j]->score < Table[j+1]->score){
-                Node* temp = Table[j];
-                Table[j] = Table[j+1];
-                Table[j+1] = temp;
-            }else if(Table[j]->score == Table[j+1]->score 
-                    && strcmp(Table[j]->name,Table[j+1]->name) > 0){
-                Node* temp = Table[j];
-                Table[j] = Table[j+1];
-                Table[j+1] = temp;
+        for(int j = i;j > 0;j--){
+            if(Table[j-1]->score < Table[j]->score){
+                Node* temp = Table[j-1];
+                Table[j-1] = Table[j];
+                Table[j] = temp;
+            }else if(Table[j-1]->score == Table[j]->score 
+                    && strcmp(Table[j-1]->name,Table[j]->name) > 0){
+                Node* temp = Table[j-1];
+                Table[j-1] = Table[j];
+                Table[j] = temp;
             }
         }
     }

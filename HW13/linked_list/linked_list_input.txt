@@ -1,0 +1,21 @@
+reverse
+push 1
+push 2
+print
+reverse
+print
+pop
+print
+push 6
+push 6
+push 6
+print
+reverse
+print
+pop
+pop
+pop
+pop
+print
+push 9
+print
