@@ -62,10 +62,12 @@ int main(){
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
+int dick = 2;
+int a[2][2] = {{1,2},{3,4}};
+void read(int b[dick][dick]){
+    printf("%d",b[1][1]);
+}
 int main(){
-    char a[5] = "a";
-    char b[5] = "b";
-    printf("%d",strcmp(a,b));
+    read(a);
     return 0;
 }
