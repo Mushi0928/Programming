@@ -97,7 +97,9 @@ TokenSet getToken(void)
 
 void advance(void) {
     curToken = getToken();
-    printf("advanced with Token: %d\n",curToken);
+    #ifdef debug
+        printf("advanced with Token: %d\n",curToken);
+    #endif
 }
 
 int match(TokenSet token) {

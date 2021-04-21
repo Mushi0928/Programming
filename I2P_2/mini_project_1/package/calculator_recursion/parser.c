@@ -5,7 +5,10 @@
 #include "codeGen.h"
 #include "lex.h"
 
+//#define debug
+
 int sbcount = 0;
+
 Symbol table[TBLSIZE];
 
 void initTable(void) {
@@ -33,7 +36,21 @@ int getval(char *str) {
     sbcount++;
     return 0;
 }
-
+int getAddr(char *str){
+    int i = 0;
+    //exist variable
+    for (i = 0; i < sbcount; i++)
+        if (strcmp(str, table[i].name) == 0)
+            return i*4;
+    //new variable
+    if (sbcount >= TBLSIZE)
+        error(RUNOUT);
+    
+    strcpy(table[sbcount].name, str);
+    table[sbcount].val = 0;
+    sbcount++;
+    return (sbcount - 1)*4;
+}
 int setval(char *str, int val) {
     int i = 0;
     //exist variable
@@ -54,7 +71,9 @@ int setval(char *str, int val) {
 }
 
 BTNode *makeNode(TokenSet tok, const char *lexe) {
-    printf("makeNode with token: %d and lexe: %s called\n",tok,lexe);
+    #ifdef debug
+        printf("makeNode with token: %d and lexe: %s called\n",tok,lexe);
+    #endif
     BTNode *node = (BTNode*)malloc(sizeof(BTNode));
     strcpy(node->lexeme, lexe);
     node->data = tok;
@@ -74,7 +93,9 @@ void freeTree(BTNode *root) {
 
 // factor := INT | ID | INCDEC ID | LPAREN assign_expr RPAREN
 BTNode *factor(void) {
-    printf("factor called\n");
+    #ifdef debug
+        printf("factor called\n");
+    #endif
     BTNode *retp = NULL, *left = NULL;
 
     if (match(INT)) {   //INT
@@ -84,11 +105,7 @@ BTNode *factor(void) {
         retp = makeNode(ID, getLexeme());
         advance();
     } else if(match(INCDEC)){
-        if(getLexeme()[0] == '+'){
-            retp = makeNode(ADDSUB,"+");
-        }else{
-            retp = makeNode(ADDSUB,"-");
-        }
+        retp = makeNode(INCDEC,getLexeme());
         advance();
         if(match(ID)){
             left = makeNode(ID,getLexeme());
@@ -110,26 +127,25 @@ BTNode *factor(void) {
 }
 // expr := term expr_tail
 BTNode *expr(ExprType expr_type) {
-    printf("expr with type: %d called\n",expr_type);
+    #ifdef debug
+        printf("expr with type: %d called\n",expr_type);
+    #endif
     BTNode *retp,*left;
     switch(expr_type){
         case ASSIGN_EXPR:
-            if(match(ID)){
-                left = makeNode(ID,getLexeme());
-                advance();
-                if(match(ASSIGN)){
+            left = expr(OR_EXPR);
+            if(match(ASSIGN)){  
+                if(left->data == ID){
                     retp = makeNode(ASSIGN,getLexeme());
                     retp->left = left;
                     advance();
                     retp->right = expr(ASSIGN_EXPR);
-                }else if(curToken >= OR && curToken <= MULDIV){
-                    retp = expr_tail(left,curToken);
-                }else if(match(END)){
-                    return left;
-                }
-                return retp;
+                    return retp;
+                }else{
+                    err(NOTNUMID);
+                }      
             }else{
-                return expr(OR_EXPR);
+                return left;
             }
             break;
         case OR_EXPR:
@@ -192,19 +208,22 @@ BTNode *expr(ExprType expr_type) {
 
 // expr_tail := ADDSUB term expr_tail | NiL
 BTNode *expr_tail(BTNode *left,ExprType expr_type) {
-    printf("expr_tail with type: %d called\n",expr_type);
-    printf("left: ");
-    printPrefix(left);
-    printf("\n");
-    BTNode *retp = NULL;
-    if(match(ASSIGN))err(SYNTAXERR);
+    #ifdef debug
+        printf("expr_tail with type: %d called\n",expr_type);
+        printf("left: ");
+        printPrefix(left);
+        printf("\n");
+    #endif
+    BTNode *retp = NULL,*temp = NULL;
     switch(expr_type){
         case OR_EXPR:
             if(match(OR)){
                 retp = makeNode(OR,getLexeme());
                 retp->left = left;
                 advance();
-                retp->right = expr(OR_EXPR);
+                retp->right = expr(XOR_EXPR);
+                temp = expr_tail(retp,OR_EXPR);
+                if(temp != NULL)return temp; 
             }
             return retp;
             break;
@@ -213,7 +232,9 @@ BTNode *expr_tail(BTNode *left,ExprType expr_type) {
                 retp = makeNode(XOR,getLexeme());
                 retp->left = left;
                 advance();
-                retp->right = expr(XOR_EXPR);
+                retp->right = expr(AND_EXPR);
+                temp = expr_tail(retp,XOR_EXPR);
+                if(temp != NULL)return temp; 
             }
             return retp;
             break;
@@ -222,7 +243,9 @@ BTNode *expr_tail(BTNode *left,ExprType expr_type) {
                 retp = makeNode(AND,getLexeme());
                 retp->left = left;
                 advance();
-                retp->right = expr(AND_EXPR);
+                retp->right = expr(ADDSUB_EXPR);
+                temp = expr_tail(retp,AND_EXPR);
+                if(temp != NULL)return temp; 
             }
             return retp;
             break;
@@ -231,7 +254,9 @@ BTNode *expr_tail(BTNode *left,ExprType expr_type) {
                 retp = makeNode(ADDSUB,getLexeme());
                 retp->left = left;
                 advance();
-                retp->right = expr(ADDSUB_EXPR);
+                retp->right = expr(MULDIV_EXPR);
+                temp = expr_tail(retp,ADDSUB_EXPR);
+                if(temp != NULL)return temp; 
             }
             return retp;
             break;
@@ -240,7 +265,9 @@ BTNode *expr_tail(BTNode *left,ExprType expr_type) {
                 retp = makeNode(MULDIV,getLexeme());
                 retp->left = left;
                 advance();
-                retp->right = expr(MULDIV_EXPR);
+                retp->right = expr(UNARY_EXPR);
+                temp = expr_tail(retp,MULDIV_EXPR);
+                if(temp != NULL)return temp;   
             }
             return retp;
             break;
@@ -252,7 +279,9 @@ BTNode *expr_tail(BTNode *left,ExprType expr_type) {
 
 // statement := END | assign_expr END 
 void statement(void) {
-    printf("statement called\n");
+    #ifdef debug
+        printf("statement called\n");
+    #endif
     BTNode *retp = NULL;
 
     if (match(END)) {
@@ -261,7 +290,7 @@ void statement(void) {
     } else {
         retp = expr(ASSIGN_EXPR);
         if (match(END)) {
-            //printf("%d\n", evaluateTree(retp));
+            printf("%d\n", evaluateTree(retp));
             printf("Prefix traversal: ");
             printPrefix(retp);
             printf("\n");

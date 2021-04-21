@@ -61,7 +61,8 @@ extern void initTable(void);
 
 // Get the value of a variable
 extern int getval(char *str);
-
+// Get the memory address of a variable
+extern int getAddr(char *str);
 // Set the value of a variable
 extern int setval(char *str, int val);
 

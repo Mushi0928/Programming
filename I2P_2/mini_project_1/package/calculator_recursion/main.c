@@ -29,9 +29,10 @@
 //		   	      ADDSUB LPAREN expr RPAREN
 
 int main() {
+    freopen("assembly.txt", "w", stdout);
     initTable();
     printf(">> ");
-    int T = 1;
+    int T = 5;
     while (T--) {
         statement();
     }

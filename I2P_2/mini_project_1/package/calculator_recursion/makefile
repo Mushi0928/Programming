@@ -7,7 +7,7 @@ O_FILES		:= lex.o parser.o codeGen.o main.o
 .PHONY: all
 
 all: $(O_FILES)
-	$(CC) -o $(EXE) $(O_FILES)
+	$(CC) -o $(EXE) $(C_FILES)
 
 %.o: %.c
 	$(CC) -c $^ -o $@
