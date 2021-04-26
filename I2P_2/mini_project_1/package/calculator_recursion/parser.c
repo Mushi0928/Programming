@@ -8,7 +8,7 @@
 //#define debug
 
 int sbcount = 0;
-
+extern int cont = 1;
 Symbol table[TBLSIZE];
 
 void initTable(void) {
@@ -21,7 +21,7 @@ void initTable(void) {
     sbcount = 3;
 }
 
-int getval(char *str) {
+int getval(char *str,BTNode* node) {
     int i = 0;
     //exist variable
     for (i = 0; i < sbcount; i++)
@@ -30,7 +30,7 @@ int getval(char *str) {
     //new variable
     if (sbcount >= TBLSIZE)
         error(RUNOUT);
-    
+    if(node->val == __INT_MAX__)error(NOTFOUND);
     strcpy(table[sbcount].name, str);
     table[sbcount].val = 0;
     sbcount++;
@@ -63,7 +63,6 @@ int setval(char *str, int val) {
     //new variable
     if (sbcount >= TBLSIZE)
         error(RUNOUT);
-    
     strcpy(table[sbcount].name, str);
     table[sbcount].val = val;
     sbcount++;
@@ -78,6 +77,7 @@ BTNode *makeNode(TokenSet tok, const char *lexe) {
     strcpy(node->lexeme, lexe);
     node->data = tok;
     node->val = 0;
+    node->rgst = -1;
     node->left = NULL;
     node->right = NULL;
     return node;
@@ -103,15 +103,25 @@ BTNode *factor(void) {
         advance();
     } else if (match(ID)) { //ID
         retp = makeNode(ID, getLexeme());
+        retp->val = __INT_MAX__;
         advance();
     } else if(match(INCDEC)){
-        retp = makeNode(INCDEC,getLexeme());
+        int incdec = 0;
+        if(getLexeme()[0] == '+')incdec = 1;
+        else incdec = -1;
+        retp = makeNode(ASSIGN,"=\0");
         advance();
         if(match(ID)){
             left = makeNode(ID,getLexeme());
             retp->left = left;
-            retp->right = makeNode(INT,"1");
+                
+            retp->right = makeNode(ADDSUB,"+");
+            retp->right->left = makeNode(ID,getLexeme());
+            retp->right->right = makeNode(INT,incdec > 0?"1":"-1");
+            
             advance();
+        }else{
+            error(SYNTAXERR);
         }
     } else if (match(LPAREN)) { //LPAREN expr RPAREN
         advance();
@@ -283,22 +293,30 @@ void statement(void) {
         printf("statement called\n");
     #endif
     BTNode *retp = NULL;
-
-    if (match(END)) {
-        printf("\n>> ");
+    if(match(ENDFILE)){
+        cont = 0;
+    }else if (match(END)) {
+        //printf("\n>> ");
         advance();
     } else {
         retp = expr(ASSIGN_EXPR);
-        if (match(END)) {
-            printf("%d\n", evaluateTree(retp));
-            printf("Prefix traversal: ");
-            printPrefix(retp);
-            printf("\n");
+        if (match(END) || match(ENDFILE)) {
+            //printf("weed\n\n\n\n\n\nweed\n");
+            int ans = evaluateTree(retp);
+            #ifdef debug
+                printf("%d\n", ans);
+                printf("Prefix traversal: ");
+                printPrefix(retp);
+                printf("\n");
+                printf(">> ");
+            #endif
+            for(int i = 0;i<8;i++){
+                r[i] = 0;
+            }
             freeTree(retp);
-            printf(">> ");
             advance();
         } else {
-            //err(SYNTAXERR);
+            err(SYNTAXERR);
         }
     }
 }
@@ -333,5 +351,6 @@ void err(ErrorType errorNum) {
                 break;
         }
     }
+    printf("EXIT 1\n");
     exit(0);
 }

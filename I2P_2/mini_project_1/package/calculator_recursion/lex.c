@@ -25,7 +25,6 @@ TokenSet getToken(void)
                 ++i;
                 c = fgetc(stdin);
             }else if(isalpha(c) || c == '_'){  //variable starts with number
-                printf("%d number\n",c);
                 err(SYNTAXERR);
                 break;
             }else{
@@ -89,7 +88,7 @@ TokenSet getToken(void)
         lexeme[i] = '\0';
         return ID;
     } else if (c == EOF) {
-        return END;
+        return ENDFILE;
     } else {
         return UNKNOWN;
     }

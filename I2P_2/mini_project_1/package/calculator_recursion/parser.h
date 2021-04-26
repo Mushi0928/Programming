@@ -49,6 +49,7 @@ typedef struct _Node {
     TokenSet data;
     int val;
     char lexeme[MAXLEN];
+    int rgst;
     struct _Node *left; 
     struct _Node *right;
 } BTNode;
@@ -56,11 +57,12 @@ typedef struct _Node {
 // The symbol table
 extern Symbol table[TBLSIZE];
 
+extern int cont;
 // Initialize the symbol table with builtin variables
 extern void initTable(void);
 
 // Get the value of a variable
-extern int getval(char *str);
+extern int getval(char *str,BTNode* node);
 // Get the memory address of a variable
 extern int getAddr(char *str);
 // Set the value of a variable

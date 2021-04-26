@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "lex.h"
+#include "codeGen.h"
 #include "parser.h"
 
 // This package is a calculator
@@ -29,12 +30,16 @@
 //		   	      ADDSUB LPAREN expr RPAREN
 
 int main() {
+    cont = 1;
     freopen("assembly.txt", "w", stdout);
     initTable();
-    printf(">> ");
-    int T = 5;
-    while (T--) {
+    //printf(">> ");
+    while (cont) {
         statement();
     }
+    printf("MOV r0 [0]\n"
+            "MOV r1 [4]\n"
+            "MOV r2 [8]\n");
+    printf("EXIT 0\n");
     return 0;
 }
